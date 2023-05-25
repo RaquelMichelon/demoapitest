@@ -24,22 +24,13 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
-//    private AutoCloseable autoCloseable;
     private UserService underTest;
 
     @BeforeEach
     void setUp() {
-        //to initialize the mock; if you have more than one, it will initialize all of them
-//        autoCloseable = MockitoAnnotations.openMocks(this);
-
         underTest = new UserService(userRepository);
     }
 
-//    @AfterEach
-//    void tearDown() {
-//        //to close the resource after each test
-//        autoCloseable.close();
-//    }
 
     @Test
     void canGetAllUsers() throws Exception {
