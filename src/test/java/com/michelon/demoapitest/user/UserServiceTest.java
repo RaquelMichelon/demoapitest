@@ -5,10 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
@@ -18,6 +20,8 @@ import static org.mockito.Mockito.verify;
  *
  * Since userRepository was already tested, we should mock userRepository here.
  * This way we isolate the service layer to test it.
+ *
+ * click on Run test with coverage to see what is not covered yet
  **/
 @ExtendWith(MockitoExtension.class) //with this annotation, the Autoclosable is dispensable.
 class UserServiceTest {
@@ -43,8 +47,24 @@ class UserServiceTest {
     }
 
     @Test
-    @Disabled
-    void addUser() {
+    void canAddUser() {
+
+        //given
+        User user = new User("Raquel", "raquel@gmail.com", Gender.FEMALE);
+
+        //when
+        underTest.addUser(user);
+
+        //then - check that repository was invoked (calling save) with the same user we passed
+        ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
+
+        //capture the value passed
+        verify(userRepository).save(userArgumentCaptor.capture());
+
+        User capturedStudent = userArgumentCaptor.getValue();
+
+        //make sure the value is the same we passed on the underTest
+        assertThat(capturedStudent).isEqualTo(user);
     }
 
     @Test
