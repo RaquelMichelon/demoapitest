@@ -1,5 +1,6 @@
 package com.michelon.demoapitest.user;
 
+import com.michelon.demoapitest.user.exception.BadRequestException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -11,7 +12,12 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -65,6 +71,28 @@ class UserServiceTest {
 
         //make sure the value is the same we passed on the underTest
         assertThat(capturedStudent).isEqualTo(user);
+    }
+
+    @Test
+    void willThrowWhenEmailIsTaken() {
+
+        //given
+        User user = new User("Raquel", "raquel@gmail.com", Gender.FEMALE);
+
+        //without this given from Mockito, the method will return always false here
+        given(userRepository.selectExistsEmail(anyString()))
+                .willReturn(true);
+
+        //when
+        //then - we have to make sure an exception is being thrown
+        assertThatThrownBy(() -> underTest.addUser(user))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Email " + user.getEmail() + " taken.");
+
+        //verify that the save method never call the save method to save any user
+        verify(userRepository, never()).save(any());
+
+
     }
 
     @Test
